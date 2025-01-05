@@ -13,6 +13,8 @@ public:
     static void adminSearchMenu();
     static void custSearchMenu();
 
+    static void monthlyAnalysisDataTable(int);
+
     static void linearSearch100Data(bool);
     static void binarySearch100Data();
     

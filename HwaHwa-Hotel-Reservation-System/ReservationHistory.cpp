@@ -2,6 +2,7 @@
 #include "Customer.h"
 #include "ReservationSearchResult.h"
 #include "ReservationHistory.h"
+#include "MonthlyStat.h"
 
 void ReservationHistory::getReservationHistoryFromFile(Reservation reservations[], int& reservationCount)
 {
@@ -312,6 +313,164 @@ void ReservationHistory::custSearchMenu()
     cout << setfill(' ');
 
     Customer::cusMenu();
+}
+
+void ReservationHistory::monthlyAnalysisDataTable(int counter = 1)
+{
+    Reservation* reservations = new Reservation[MAX_RESERVATIONS];
+    int rowSize = 0;
+
+    // Load reservations from a file
+    ReservationHistory::getReservationHistoryFromFile(reservations, rowSize);
+
+    // Correct 2D array allocation
+    MonthlyStat** stats = new MonthlyStat * [2];
+    for (int i = 0; i < 2; i++) {
+        stats[i] = new MonthlyStat[12];
+
+        // Initialize each MonthlyStat object with zero values
+        for (int j = 0; j < 12; j++) {
+            stats[i][j].setCount(0);
+            stats[i][j].setTotalPrice(0.0);
+            stats[i][j].setAvgPrice(0.0);
+        }
+    }
+
+    // Process each reservation
+    for (int i = 0; i < rowSize; i++) {
+        string date = reservations[i].getDate();
+        // Parse date (format: "mm/dd/yyyy")
+        int month = stoi(date.substr(0, date.find('/'))) - 1; // 0-11
+        int year = stoi(date.substr(date.rfind('/') + 1));
+
+        if (year < 2023 || year > 2024) continue;
+
+        int yearIndex = year - 2023; // 0 for 2023, 1 for 2024
+
+        // Update statistics
+        stats[yearIndex][month].setCount(stats[yearIndex][month].getCount() + 1);
+        stats[yearIndex][month].setTotalPrice(stats[yearIndex][month].getTotalPrice() + reservations[i].getTotalPrice());
+
+    }
+
+    const string months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+    system("cls");
+    cout << fixed;
+
+    cout << "\n\n\t\t\t\t\t\t\t1. Back\n" << endl;
+
+    cout << "\t\t" << setfill('-') << setw(90) << "\n";
+    cout << "\t\t|" << setfill(' ') << setw(50) << "Analysis of Year " << (counter == 1 ? "2023" : "2024") << setw(34) << "|";
+
+    cout << "\n\t\t" << setfill('-') << setw(90) << "\n";
+    cout << "\t\t|" << setfill(' ') << setw(20) << "Month" << " |";
+    cout << setfill(' ') << setw(20) << "Total Reservation" << " |";
+    cout << setfill(' ') << setw(20) << "Total Profit" << " |";
+    cout << setfill(' ') << setw(20) << "Average Profit" << " |";
+    cout << "\n\t\t" << setfill('-') << setw(90) << "\n";
+
+    double sum = 0;
+    int count = 0;
+
+    // Display for both years
+    for (int month = 0; month < 12; month++) {
+        MonthlyStat& s = stats[counter - 1][month];
+        // Calculate average if there are reservations
+        if (s.getCount() > 0) {
+            s.calculateAvgPrice();
+        }
+
+        cout << "\t\t|" << setfill(' ') << setw(15) << months[month] << " " << (2023 + counter - 1) << " |";
+        cout << setfill(' ') << setw(20) << s.getCount() << " |";
+        cout << setfill(' ') << setw(20) << fixed << setprecision(2) << s.getTotalPrice() << " |";
+        cout << setfill(' ') << setw(20) << s.getAvgPrice() << " |";
+        cout << "\n\t\t" << setfill('-') << setw(90) << "\n";
+
+        count += s.getCount();
+        sum += s.getTotalPrice();
+    }
+
+    int c = 0;
+    int scaledSum = sum;
+
+    while (scaledSum >= 100) {
+        scaledSum /= 10;
+        c++;
+    }
+
+    double avg = sum * 1.0 / 12;
+
+    cout << "\t\t|" << setfill(' ') << setw(47) << "Total Reservation: " << count << setw(38) << "|\n";
+    cout << "\t\t" << setfill('-') << setw(90) << "\n";
+
+    cout << "\t\t|" << setfill(' ') << setw(45) << "Total Profit: RM " << sum << setw(31 + c + (counter == 2 ? -2 : 0)) << "|\n";
+    cout << "\t\t" << setfill('-') << setw(90) << "\n";
+
+    c = 0;
+    int scaledAvg = avg;
+
+    while (scaledAvg >= 100) {
+        scaledAvg /= 10;
+        c++;
+    }
+
+    cout << "\t\t|" << setfill(' ') << setw(55) << "Monthly Average Profit: RM " << avg << setw(23 + c + (counter == 2 ? -2 : 0)) << "|\n";
+    cout << "\t\t" << setfill('-') << setw(90) << "\n";
+
+    // Navigation prompt
+    cout << endl << setfill(' ') << right << setw(60) << "> 1";
+
+    unsigned char opt = 0;
+    int current = 1;
+    int i = 1;
+
+    while ((opt = _getch()) != RETURN) {
+
+        if (opt == 77 && i != 10) // move right
+        {
+            ++i;
+            if (i * 10 > ceil(100) + 10) {
+                i--;
+            }
+
+            ReservationHistory::monthlyAnalysisDataTable(i);
+            continue;
+        }
+        else if (opt == 75) // move left
+        {
+            --i;
+            if (i <= 0)
+                i = 1;
+
+            ReservationHistory::monthlyAnalysisDataTable(i);
+            continue;
+        }
+
+        if (opt == 72) // move down
+        {
+            if (current > 1) {
+                cout << "\b \b";
+                cout << --current;
+            }
+
+        }
+        else if (opt == 80) // move up
+        {
+            if (current < 1) {
+                cout << "\b \b";
+                cout << ++current;
+            }
+        }
+
+        fflush(stdin);
+    }
+
+    if (current == 1)
+    {
+        Admin::adminMenu();
+    }
+
 }
 
 void ReservationHistory::linearSearch100Data(bool IsImproved = false)

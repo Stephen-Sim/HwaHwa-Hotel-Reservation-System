@@ -131,6 +131,7 @@
     <ClCompile Include="Customer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="MonthlyStat.cpp" />
     <ClCompile Include="Reservation.cpp" />
     <ClCompile Include="ReservationHistory.cpp" />
     <ClCompile Include="ReservationSearchResult.cpp" />
@@ -139,6 +140,7 @@
     <ClInclude Include="Admin.h" />
     <ClInclude Include="Customer.h" />
     <ClInclude Include="Menu.h" />
+    <ClInclude Include="MonthlyStat.h" />
     <ClInclude Include="Reservation.h" />
     <ClInclude Include="ReservationHistory.h" />
     <ClInclude Include="ReservationSearchResult.h" />

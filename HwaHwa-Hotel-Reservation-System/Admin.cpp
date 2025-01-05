@@ -64,7 +64,7 @@ void Admin::adminMenu() {
     cout << setw(74) << "2. Search Customer Info\n\n";
     cout << setw(88) << "3. 100 Data Searching - Linear Search\n\n";
     cout << setw(88) << "4. 100 Data Searching - Binary Search\n\n";
-    cout << setw(68) << "5. Month Analysis\n\n";
+    cout << setw(70) << "5. Monthly Analysis\n\n";
     cout << setw(58) << "6. Back\n\n";
 
     cout << setw(45);
@@ -123,7 +123,7 @@ void Admin::adminAction(int opt) {
 	}
 	else if (opt == 5)
 	{
-		// ReservationHistory::monthAnalysis();
+		ReservationHistory::monthlyAnalysisDataTable(1);
 	}
     else if (opt == 6)
     {
