@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Reservation.h"
+#include "ReservationSearchResult.h"
 
 #define MAX_RESERVATIONS 11000
 
@@ -11,12 +12,18 @@ public:
 
     static void adminSearchMenu();
     static void custSearchMenu();
+
+    static void linearSearch100Data(bool);
+    static void binarySearch100Data();
     
     static void displayReservationHistory();
     static void getReservationHistoryDataTable(Reservation[], int);
 
-    static void displaySort(Reservation [], int, double, string);
-    static void sortReservationHistoryDataTable(Reservation[], int, int, double, string);
+    static void displaySort(Reservation [], int, long long, long long, double, string, bool, int);
+    static void sortReservationHistoryDataTable(Reservation[], int, int, long long, long long, double, string, bool, int);
+
+    static void linearSearch100DataDataTable(ReservationSearchResult[], int, int, int, long long, long long, double, int, bool);
+    static void binarySearch100DataDataTable(ReservationSearchResult [], int , int , int , long long , long long , double, int);
 
     // searching
     static int linearSearchByCustomerName(Reservation[], string, Reservation[]);
@@ -24,6 +31,6 @@ public:
 
     // sorting
     static void mergeSortByCustomerName(Reservation reservations[], int left, int right, Reservation temp[]);
-    static void bubbleSortByPrice(Reservation reservations[], int size);
+    static int bubbleSortByPrice(Reservation reservations[], int size, bool);
 };
 

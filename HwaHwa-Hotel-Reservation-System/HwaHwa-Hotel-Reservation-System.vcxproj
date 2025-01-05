@@ -133,6 +133,7 @@
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Reservation.cpp" />
     <ClCompile Include="ReservationHistory.cpp" />
+    <ClCompile Include="ReservationSearchResult.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Admin.h" />
@@ -140,6 +141,7 @@
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Reservation.h" />
     <ClInclude Include="ReservationHistory.h" />
+    <ClInclude Include="ReservationSearchResult.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

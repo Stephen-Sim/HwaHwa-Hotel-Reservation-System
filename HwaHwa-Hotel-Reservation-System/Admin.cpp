@@ -50,7 +50,7 @@ string Admin::getPass(bool show_asterisk = true)
 void Admin::adminMenu() {
     system("cls");
 
-    cout << "\n\n\n\n\n\n\n\n";
+    cout << "\n\n\n\n\n\n";
 
     cout << setw(45);
     for (int i = 0; i < 33; i++)
@@ -62,7 +62,10 @@ void Admin::adminMenu() {
     cout << endl << setw(68) << "Admin Action\n\n";
     cout << setw(80) << "1. Display Reservation Detail\n\n";
     cout << setw(74) << "2. Search Customer Info\n\n";
-    cout << setw(58) << "3. Back\n\n";
+    cout << setw(88) << "3. 100 Data Searching - Linear Search\n\n";
+    cout << setw(88) << "4. 100 Data Searching - Binary Search\n\n";
+    cout << setw(68) << "5. Month Analysis\n\n";
+    cout << setw(58) << "6. Back\n\n";
 
     cout << setw(45);
     for (int i = 0; i < 33; i++)
@@ -88,7 +91,7 @@ void Admin::adminMenu() {
         }
         else if (opt == 80) // move up
         {
-            if (current < 3) {
+            if (current < 6) {
                 cout << "\b \b";
                 cout << ++current;
             }
@@ -110,7 +113,19 @@ void Admin::adminAction(int opt) {
     {
         ReservationHistory::adminSearchMenu();
     }
-    else if (opt == 3)
+	else if (opt == 3)
+	{
+	    ReservationHistory::linearSearch100Data(false);
+	}
+	else if (opt == 4)
+	{
+		ReservationHistory::binarySearch100Data();
+	}
+	else if (opt == 5)
+	{
+		// ReservationHistory::monthAnalysis();
+	}
+    else if (opt == 6)
     {
         Menu::userAction(Menu::selectUser());
     }

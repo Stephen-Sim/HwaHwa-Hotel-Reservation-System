@@ -1,6 +1,7 @@
-#include "ReservationHistory.h"
 #include "Admin.h"
 #include "Customer.h"
+#include "ReservationSearchResult.h"
+#include "ReservationHistory.h"
 
 void ReservationHistory::getReservationHistoryFromFile(Reservation reservations[], int& reservationCount)
 {
@@ -102,8 +103,6 @@ void ReservationHistory::adminSearchMenu()
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> duration = end - start;
     double milliseconds = duration.count() * 1000;
-
-    // Display the time taken in milliseconds
 
     if (resultRow != 0)
     {
@@ -315,6 +314,159 @@ void ReservationHistory::custSearchMenu()
     Customer::cusMenu();
 }
 
+void ReservationHistory::linearSearch100Data(bool IsImproved = false)
+{
+    string* datas = new string[100];
+    ifstream inputFile("100-sample.txt", ios::in);
+
+    if (!inputFile.is_open())
+    {
+        cout << "Unable to open file" << endl;
+        return;
+    }
+
+    int index = 0;
+    string line;
+
+    while (getline(inputFile, line) && index < 100)
+    {
+        datas[index++] = line;
+    }
+
+    inputFile.close();
+
+    ReservationSearchResult* results = new ReservationSearchResult[100];
+    Reservation* reservations = new Reservation[MAX_RESERVATIONS];
+    int rowSize = 0;
+
+    ReservationHistory::getReservationHistoryFromFile(reservations, rowSize);
+
+    // Start measuring time
+    auto start = chrono::high_resolution_clock::now();
+
+    int found = 0, notFound = 0;
+
+    int resultCount = 0;
+
+    for (int outerIndex = 0; outerIndex < 100; outerIndex++)
+    {
+        results[resultCount].setBookingId(datas[outerIndex]);
+        bool isFound = false;
+
+        for (int innerIndex = 0; innerIndex < rowSize; innerIndex++)
+        {
+            if (reservations[innerIndex].getBookingId() == datas[outerIndex])
+            {
+                results[resultCount].setReservation(reservations[innerIndex]);
+                results[resultCount].setIsReservationFound(true);
+                isFound = true;
+                found++;
+
+                if (IsImproved)
+                {
+                    break;
+                }
+            }
+        }
+
+        if (!isFound)
+        {
+            results[resultCount].setIsReservationFound(false);
+            notFound++;
+        }
+
+        resultCount++;
+    }
+
+    // End measuring time
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> duration = end - start; // Duration in seconds
+    double milliseconds = duration.count() * 1000;
+
+    ReservationHistory::linearSearch100DataDataTable(results, 1, found, notFound, start.time_since_epoch().count(), end.time_since_epoch().count(), milliseconds, 1, IsImproved);
+}
+
+void ReservationHistory::binarySearch100Data()
+{
+    system("cls");
+    cout << fixed;
+
+    string* datas = new string[100];
+    ifstream inputFile("100-sample.txt", ios::in);
+
+    if (!inputFile.is_open())
+    {
+        cout << "Unable to open file" << endl;
+        return;
+    }
+
+    int index = 0;
+    string line;
+
+    while (getline(inputFile, line) && index < 100)
+    {
+        datas[index++] = line;
+    }
+
+    inputFile.close();
+
+    ReservationSearchResult* results = new ReservationSearchResult[100];
+    Reservation* reservations = new Reservation[MAX_RESERVATIONS];
+    int rowSize = 0;
+
+    ReservationHistory::getReservationHistoryFromFile(reservations, rowSize);
+
+    // Start measuring time
+    auto start = chrono::high_resolution_clock::now();
+
+    int found = 0, notFound = 0;
+
+    int resultCount = 0;
+
+    for (int outerIndex = 0; outerIndex < 100; outerIndex++)
+    {
+        results[resultCount].setBookingId(datas[outerIndex]);
+
+        // Binary search for the current datas[outerIndex] in reservations array
+        int left = 0;
+        int right = rowSize - 1;
+        bool isFound = false;
+
+        while (left <= right)
+        {
+            int mid = left + (right - left) / 2;
+
+            if (reservations[mid].getBookingId() == datas[outerIndex]) {
+                results[resultCount].setReservation(reservations[mid]);
+                results[resultCount].setIsReservationFound(true);
+                found++;
+                isFound = true;
+                break;
+            }
+            else if (reservations[mid].getBookingId() < datas[outerIndex]) {
+                left = mid + 1;
+            }
+            else {
+                right = mid - 1;
+            }
+        }
+
+        if (!isFound)
+        {
+            results[resultCount].setIsReservationFound(false);
+            notFound++;
+        }
+
+        resultCount++;
+    }
+
+    // End measuring time
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> duration = end - start; // Duration in seconds
+    double milliseconds = duration.count() * 1000;
+    ReservationHistory::binarySearch100DataDataTable(results, 1, found, notFound, start.time_since_epoch().count(), end.time_since_epoch().count(), milliseconds, 1);
+}
+
 void ReservationHistory::displayReservationHistory()
 {
     system("cls");
@@ -372,7 +524,7 @@ void ReservationHistory::displayReservationHistory()
     }
 
     if (current == 1) {
-        ReservationHistory::displaySort(reservations, 1, 0.0, "");
+        ReservationHistory::displaySort(reservations, 1, 0, 0, 0.0, "", false, 0);
     }
     else if (current == 2)
     {
@@ -380,11 +532,11 @@ void ReservationHistory::displayReservationHistory()
     }
 }
 
-void ReservationHistory::displaySort(Reservation reservations[], int current, double time = 0.0, string sorting_method = "")
+void ReservationHistory::displaySort(Reservation reservations[], int current, long long start = 0, long long end = 0, double time = 0.0, string sorting_method = "", bool isImproved = true, int swap = 0)
 {
     unsigned char opt = 0; int i = 1;
 
-    ReservationHistory::sortReservationHistoryDataTable(reservations, i, current, time, sorting_method);
+    ReservationHistory::sortReservationHistoryDataTable(reservations, i, current, start, end, time, sorting_method, isImproved, swap);
 
     while ((opt = _getch()) != RETURN) {
 
@@ -395,7 +547,7 @@ void ReservationHistory::displaySort(Reservation reservations[], int current, do
                 i--;
             }
 
-            ReservationHistory::sortReservationHistoryDataTable(reservations, i, current, time, sorting_method);
+            ReservationHistory::sortReservationHistoryDataTable(reservations, i, current, start, end, time, sorting_method, isImproved, swap);
             continue;
         }
         else if (opt == 75) // move left
@@ -404,7 +556,7 @@ void ReservationHistory::displaySort(Reservation reservations[], int current, do
             if (i <= 0)
                 i = 1;
 
-            ReservationHistory::sortReservationHistoryDataTable(reservations, i, current, time, sorting_method);
+            ReservationHistory::sortReservationHistoryDataTable(reservations, i, current, start, end, time, sorting_method, isImproved, swap);
             continue;
         }
         else if (opt == 72) // move up
@@ -446,7 +598,7 @@ void ReservationHistory::displaySort(Reservation reservations[], int current, do
         double milliseconds = duration.count() * 1000; // Convert to milliseconds
 
         // Display sorted results
-        ReservationHistory::displaySort(reservations, current, milliseconds, "Merge Sort");
+        ReservationHistory::displaySort(reservations, current, start.time_since_epoch().count(), end.time_since_epoch().count(), milliseconds, "Merge Sort", isImproved);
     }
     else if (current == 2)
     {
@@ -460,24 +612,24 @@ void ReservationHistory::displaySort(Reservation reservations[], int current, do
         auto start = chrono::high_resolution_clock::now();
 
         // Perform bubble sort
-        ReservationHistory::bubbleSortByPrice(reservations, rowSize);
+        int swap = ReservationHistory::bubbleSortByPrice(reservations, rowSize, isImproved);
 
         // End measuring time
         auto end = chrono::high_resolution_clock::now();
         chrono::duration<double> duration = end - start; // Duration in seconds
         double milliseconds = duration.count() * 1000; // Convert to milliseconds
 
-        ReservationHistory::displaySort(reservations, current, milliseconds, "Bubble Sort");
+        ReservationHistory::displaySort(reservations, current, start.time_since_epoch().count(), end.time_since_epoch().count(), milliseconds, "Bubble Sort", !isImproved, swap);
     }
     else if (current == 3) {
         ReservationHistory::displayReservationHistory();
     }
 }
 
-void ReservationHistory::sortReservationHistoryDataTable(Reservation reservations[], int counter, int current, double time = 0.0, string sorting_method = "")
+void ReservationHistory::sortReservationHistoryDataTable(Reservation reservations[], int counter, int current, long long start, long long end, double time = 0.0, string sorting_method = "", bool isImproved = true, int swap = 0)
 {
     system("cls");
-    cout << "\n\n\t\t\t\t1. Sort By Customer Name\t\t2. Sort By Highest Price\t\t3. Back" << endl;
+    cout << "\n\n\t\t\t\t1. Sort By Customer Name\t2. Sort By Highest Price " << (!isImproved ? "Without Improvement" : "With Improvement") << "\t\t3. Back" << endl;
     cout << fixed;
 
     // table header
@@ -509,14 +661,241 @@ void ReservationHistory::sortReservationHistoryDataTable(Reservation reservation
         cout << "\n\t" << setfill('-') << setw(149) << "\n";
     }
 
-
     if (time != 0.0)
     {
+        cout << "\n\t\t\t\t\t\t\tStart Time: " << start << "\tEnd Time: " << end << endl;
         cout << "\n\t\t\t\t\t\t\tTime taken for search: " << time << " milliseconds." << endl;
-        cout << "\n\t\t\t\t\t\t\t\t" << sorting_method << " techniques is used." << endl;
+        cout << "\n\t\t\t\t\t\t\t" << sorting_method << " techniques is used." << endl;
+
+        if (sorting_method == "Bubble Sort")
+        {
+            cout << "\n\t\t\t\t\t\t\tNumber of Swap: " << swap << endl;
+        }
     }
 
     cout << endl << setfill(' ') << setw(80) << "> " << current;
+}
+
+void ReservationHistory::linearSearch100DataDataTable(ReservationSearchResult results[], int counter, int found, int notFound, long long start, long long end, double milliseconds, int current, bool isImproved)
+{
+    system("cls");
+    cout << fixed;
+
+    cout << "\n\n\t\t\t\t\t\t" << (!isImproved ? "1. Searching with Improvement" : "1. Searching without Improvement") << " \t\t2. Back" << endl;
+
+    cout << "\n\t" << setfill('-') << setw(149) << "\n";
+    cout << "\t|" << setfill(' ') << setw(5) << "Bil" << " |";
+    cout << setfill(' ') << setw(15) << "Booking ID" << " |";
+    cout << setfill(' ') << setw(20) << "Username" << " |";
+    cout << setfill(' ') << setw(8) << "People" << " |";
+    cout << setfill(' ') << setw(10) << "Nights" << " |";
+    cout << setfill(' ') << setw(15) << "Meal Type" << " |";
+    cout << setfill(' ') << setw(10) << "Parking" << " |";
+    cout << setfill(' ') << setw(20) << "Room Type" << " |";
+    cout << setfill(' ') << setw(12) << "Date" << " |";
+    cout << setfill(' ') << setw(12) << "Total Price" << " |";
+    cout << "\n\t" << setfill('-') << setw(149) << "\n";
+
+    if (counter < 1)
+    {
+        counter = 1;
+    }
+    
+    if (counter > 10)
+    {
+        counter = 10;
+    }
+
+    for (int i = (counter - 1) * 10; i < counter * 10 && i <= 100; i++)
+    {
+        if (results[i].getIsReservationFound())
+        {
+            cout << "\t|" << setfill(' ') << setw(5) << i + 1 << " |";
+            cout << setfill(' ') << setw(15) << results[i].getReservation().getBookingId() << " |";
+            cout << setfill(' ') << setw(20) << results[i].getReservation().getUsername() << " |";
+            cout << setfill(' ') << setw(8) << results[i].getReservation().getNumberOfPeople() << " |";
+            cout << setfill(' ') << setw(10) << results[i].getReservation().getNumberOfNights() << " |";
+            cout << setfill(' ') << setw(15) << results[i].getReservation().getMealTypeValue() << " |";
+            cout << setfill(' ') << setw(10) << (results[i].getReservation().isCarParkingRequired() ? "Yes" : "No") << " |";
+            cout << setfill(' ') << setw(20) << results[i].getReservation().getRoomTypeValue() << " |";
+            cout << setfill(' ') << setw(12) << results[i].getReservation().getDate() << " |";
+            cout << setfill(' ') << setw(12) << setprecision(2) << results[i].getReservation().getTotalPrice() << " |";
+            cout << "\n\t" << setfill('-') << setw(149) << "\n";
+        }
+        else
+        {
+            cout << "\t|" << setfill(' ') << setw(5) << i + 1 << " |";
+            cout << setfill(' ') << setw(70) << results[i].getBookingId() + " is not found." << setfill(' ') << setw(70) << " |";
+            cout << "\n\t" << setfill('-') << setw(149) << "\n";
+        }
+    }
+
+    cout << "\n\t\t\t\t\t\t\tTotal Found: " << found << "\t\tTotal Not Found: " << notFound << endl;
+    cout << "\n\t\t\t\t\t\t\tStart Time: " << start << "\tEnd Time: " << end << endl;
+    cout << "\n\t\t\t\t\t\t\tTime taken for search: " << milliseconds << " milliseconds." << endl;
+    cout << "\n\t\t\t\t\t\t\tLinear Search techniques is used." << endl;
+
+    cout << "\n\n\t\t\t\t\t\t\t\t";
+
+    cout << endl << setfill(' ') << setw(80) << "> " << current;
+
+    unsigned char opt = 0; int i = 1;
+
+    while ((opt = _getch()) != RETURN) {
+
+        if (opt == 77 && i != 10) // move right
+        {
+            ++i;
+            if (i * 10 > ceil(100) + 10) {
+                i--;
+            }
+
+            ReservationHistory::linearSearch100DataDataTable(results, ++counter, found, notFound, start, end, milliseconds, current, isImproved);
+            continue;
+        }
+        else if (opt == 75) // move left
+        {
+            --i;
+            if (i <= 0)
+                i = 1;
+
+            ReservationHistory::linearSearch100DataDataTable(results, --counter, found, notFound, start, end, milliseconds, current, isImproved);
+            continue;
+        }
+        else if (opt == 72) // move up
+        {
+            if (current > 1) {
+                cout << "\b \b";
+                cout << --current;
+            }
+        }
+        else if (opt == 80) // move up
+        {
+            if (current < 3) {
+                cout << "\b \b";
+                cout << ++current;
+            }
+        }
+
+        fflush(stdin);
+    }
+
+    if (current == 1)
+    {
+        ReservationHistory::linearSearch100Data(!isImproved);
+    }
+    else if (current == 2) {
+        Admin::adminMenu();
+    }
+}
+
+void ReservationHistory::binarySearch100DataDataTable(ReservationSearchResult results[], int counter, int found, int notFound, long long start, long long end, double milliseconds, int current)
+{
+    system("cls");
+    cout << fixed;
+
+    cout << "\n\n\t\t\t\t\t\t\t\t\t1. Back" << endl;
+
+    cout << "\n\t" << setfill('-') << setw(149) << "\n";
+    cout << "\t|" << setfill(' ') << setw(5) << "Bil" << " |";
+    cout << setfill(' ') << setw(15) << "Booking ID" << " |";
+    cout << setfill(' ') << setw(20) << "Username" << " |";
+    cout << setfill(' ') << setw(8) << "People" << " |";
+    cout << setfill(' ') << setw(10) << "Nights" << " |";
+    cout << setfill(' ') << setw(15) << "Meal Type" << " |";
+    cout << setfill(' ') << setw(10) << "Parking" << " |";
+    cout << setfill(' ') << setw(20) << "Room Type" << " |";
+    cout << setfill(' ') << setw(12) << "Date" << " |";
+    cout << setfill(' ') << setw(12) << "Total Price" << " |";
+    cout << "\n\t" << setfill('-') << setw(149) << "\n";
+
+    if (counter < 1)
+    {
+        counter = 1;
+    }
+
+    if (counter > 10)
+    {
+        counter = 10;
+    }
+
+    for (int i = (counter - 1) * 10; i < counter * 10 && i <= 100; i++)
+    {
+        if (results[i].getIsReservationFound())
+        {
+            cout << "\t|" << setfill(' ') << setw(5) << i + 1 << " |";
+            cout << setfill(' ') << setw(15) << results[i].getReservation().getBookingId() << " |";
+            cout << setfill(' ') << setw(20) << results[i].getReservation().getUsername() << " |";
+            cout << setfill(' ') << setw(8) << results[i].getReservation().getNumberOfPeople() << " |";
+            cout << setfill(' ') << setw(10) << results[i].getReservation().getNumberOfNights() << " |";
+            cout << setfill(' ') << setw(15) << results[i].getReservation().getMealTypeValue() << " |";
+            cout << setfill(' ') << setw(10) << (results[i].getReservation().isCarParkingRequired() ? "Yes" : "No") << " |";
+            cout << setfill(' ') << setw(20) << results[i].getReservation().getRoomTypeValue() << " |";
+            cout << setfill(' ') << setw(12) << results[i].getReservation().getDate() << " |";
+            cout << setfill(' ') << setw(12) << setprecision(2) << results[i].getReservation().getTotalPrice() << " |";
+            cout << "\n\t" << setfill('-') << setw(149) << "\n";
+        }
+        else
+        {
+            cout << "\t|" << setfill(' ') << setw(5) << i + 1 << " |";
+            cout << setfill(' ') << setw(70) << results[i].getBookingId() + " is not found." << setfill(' ') << setw(70) << " |";
+            cout << "\n\t" << setfill('-') << setw(149) << "\n";
+        }
+    }
+
+    cout << "\n\t\t\t\t\t\t\tTotal Found: " << found << "\t\tTotal Not Found: " << notFound << endl;
+    cout << "\n\t\t\t\t\t\t\tStart Time: " << start << "\tEnd Time: " << end << endl;
+    cout << "\n\t\t\t\t\t\t\tTime taken for search: " << milliseconds << " milliseconds." << endl;
+    cout << "\n\t\t\t\t\t\t\tBinary Search techniques is used." << endl;
+
+    cout << "\n\n\t\t\t\t\t\t\t\t";
+
+    cout << endl << setfill(' ') << setw(80) << "> " << current;
+
+    unsigned char opt = 0; int i = 1;
+
+    while ((opt = _getch()) != RETURN) {
+
+        if (opt == 77 && i != 10) // move right
+        {
+            ++i;
+            if (i * 10 > ceil(100) + 10) {
+                i--;
+            }
+
+            ReservationHistory::binarySearch100DataDataTable(results, ++counter, found, notFound, start, end, milliseconds, current);
+            continue;
+        }
+        else if (opt == 75) // move left
+        {
+            --i;
+            if (i <= 0)
+                i = 1;
+
+            ReservationHistory::binarySearch100DataDataTable(results, --counter, found, notFound, start, end, milliseconds, current);
+            continue;
+        }
+        else if (opt == 72) // move up
+        {
+            if (current > 1) {
+                cout << "\b \b";
+                cout << --current;
+            }
+        }
+        else if (opt == 80) // move down
+        {
+            if (current < 1) {
+                cout << "\b \b";
+                cout << ++current;
+            }
+        }
+
+        fflush(stdin);
+    }
+
+    if (current == 1) {
+        Admin::adminMenu();
+    }
 }
 
 int ReservationHistory::linearSearchByCustomerName(Reservation reservations[], string customerName, Reservation result[]) {
@@ -572,7 +951,6 @@ int ReservationHistory::binarySearchByCustomerName(Reservation reservations[], s
     return resultCount; // Return the number of matching rows
 }
 
-
 void ReservationHistory::mergeSortByCustomerName(Reservation reservations[], int left, int right, Reservation temp[]) {
     if (left >= right) {
         return; // Base case: single element
@@ -608,11 +986,15 @@ void ReservationHistory::mergeSortByCustomerName(Reservation reservations[], int
     }
 }
 
-void ReservationHistory::bubbleSortByPrice(Reservation reservations[], int size) {
+int ReservationHistory::bubbleSortByPrice(Reservation reservations[], int size, bool isImproved) {
+    int count = 0;
+
     for (int i = 0; i < size - 1; i++) {
         bool swapped = false;
 
-        for (int j = 0; j < size - 1 - i; j++) {
+        int expression = isImproved ? size - 1 - i : size - 1;
+
+        for (int j = 0; j < expression; j++) {
             if (reservations[j].getTotalPrice() < reservations[j + 1].getTotalPrice()) {
                 // Swap using a temporary variable
                 Reservation temp = reservations[j];
@@ -620,15 +1002,18 @@ void ReservationHistory::bubbleSortByPrice(Reservation reservations[], int size)
                 reservations[j + 1] = temp;
 
                 swapped = true;
+
+                count++;
             }
         }
 
-        if (!swapped) {
+        if (isImproved && !swapped) {
             break; // Early exit if no swaps occurred
         }
     }
-}
 
+    return count;
+}
 
 void ReservationHistory::getReservationHistoryDataTable(Reservation reservations [], int counter)
 {
