@@ -183,7 +183,7 @@ void ReservationHistory::adminSearchMenu()
         cout << "\t" << setfill('-') << setw(149) << "\n";
 
         cout << "\n\t\t\t\t\t\t\t\tTime taken for search: " << milliseconds << " milliseconds." << endl;
-        cout << "\n\t\t\t\t\t\t\t\t    Binary Search techniques is used." << endl;
+        cout << "\n\t\t\t\t\t\t\t\t    Binary Search technique is used." << endl;
 
         cout << "\n\n\n\n\t\t\t\t\t\t\t\t";
 
@@ -293,7 +293,7 @@ void ReservationHistory::custSearchMenu()
         cout << "\t" << setfill('-') << setw(149) << "\n";
 
         cout << "\n\t\t\t\t\t\t\tTime taken for search: " << milliseconds << " milliseconds." << endl;
-        cout << "\n\t\t\t\t\t\t\t\tLinear Search techniques is used." << endl;
+        cout << "\n\t\t\t\t\t\t\t\tLinear Search technique is used." << endl;
 
         cout << "\n\n\n\n\t\t\t\t\t\t\t\t";
     }
@@ -824,7 +824,7 @@ void ReservationHistory::sortReservationHistoryDataTable(Reservation reservation
     {
         cout << "\n\t\t\t\t\t\t\tStart Time: " << start << "\tEnd Time: " << end << endl;
         cout << "\n\t\t\t\t\t\t\tTime taken for search: " << time << " milliseconds." << endl;
-        cout << "\n\t\t\t\t\t\t\t" << sorting_method << " techniques is used." << endl;
+        cout << "\n\t\t\t\t\t\t\t" << sorting_method << " technique is used." << endl;
 
         if (sorting_method == "Bubble Sort")
         {
@@ -892,7 +892,7 @@ void ReservationHistory::linearSearch100DataDataTable(ReservationSearchResult re
     cout << "\n\t\t\t\t\t\t\tTotal Found: " << found << "\t\tTotal Not Found: " << notFound << endl;
     cout << "\n\t\t\t\t\t\t\tStart Time: " << start << "\tEnd Time: " << end << endl;
     cout << "\n\t\t\t\t\t\t\tTime taken for search: " << milliseconds << " milliseconds." << endl;
-    cout << "\n\t\t\t\t\t\t\tLinear Search techniques is used." << endl;
+    cout << "\n\t\t\t\t\t\t\tLinear Search technique is used." << endl;
 
     cout << "\n\n\t\t\t\t\t\t\t\t";
 
@@ -1005,7 +1005,7 @@ void ReservationHistory::binarySearch100DataDataTable(ReservationSearchResult re
     cout << "\n\t\t\t\t\t\t\tTotal Found: " << found << "\t\tTotal Not Found: " << notFound << endl;
     cout << "\n\t\t\t\t\t\t\tStart Time: " << start << "\tEnd Time: " << end << endl;
     cout << "\n\t\t\t\t\t\t\tTime taken for search: " << milliseconds << " milliseconds." << endl;
-    cout << "\n\t\t\t\t\t\t\tBinary Search techniques is used." << endl;
+    cout << "\n\t\t\t\t\t\t\tBinary Search technique is used." << endl;
 
     cout << "\n\n\t\t\t\t\t\t\t\t";
 
@@ -1151,23 +1151,20 @@ int ReservationHistory::bubbleSortByPrice(Reservation reservations[], int size, 
     for (int i = 0; i < size - 1; i++) {
         bool swapped = false;
 
-        int expression = isImproved ? size - 1 - i : size - 1;
-
-        for (int j = 0; j < expression; j++) {
+        for (int j = 0; isImproved ? j < size - 1 - i : j < size - 1; j++) {
             if (reservations[j].getTotalPrice() < reservations[j + 1].getTotalPrice()) {
-                // Swap using a temporary variable
+                
                 Reservation temp = reservations[j];
                 reservations[j] = reservations[j + 1];
                 reservations[j + 1] = temp;
-
+                
                 swapped = true;
-
                 count++;
             }
         }
 
-        if (isImproved && !swapped) {
-            break; // Early exit if no swaps occurred
+        if (isImproved && !swapped) { // Break if no swaps occurred and isImproved is true
+            break;
         }
     }
 
