@@ -173,10 +173,10 @@ void Reservation::addCustomerReservation(Reservation reservations[], int size)
         default: base_price = 0; break;
     }
 
-    switch (room_type)
+    switch (meal_type)
     {
-        case 1: base_price += 30; break;  // Single Room
-        case 2: base_price += 50; break; // Double Room
+        case 1: base_price += 30; break;  // Breakfast
+        case 2: base_price += 50; break; // Full board
         default:; break;
     }
 
@@ -416,7 +416,14 @@ int Reservation::getReservationRoomType(int nop)
         roomTypes[roomCount++] = "Family Room";
         roomTypes[roomCount++] = "Presidential Room";
     }
-    else if (nop == 2 || nop == 3)
+    else if (nop == 2)
+    {
+        roomTypes[roomCount++] = "Double Room";
+        roomTypes[roomCount++] = "Deluxe Room";
+        roomTypes[roomCount++] = "Family Room";
+        roomTypes[roomCount++] = "Presidential Room";
+    }
+    else if (nop == 3)
     {
         roomTypes[roomCount++] = "Double Room";
         roomTypes[roomCount++] = "Deluxe Room";
