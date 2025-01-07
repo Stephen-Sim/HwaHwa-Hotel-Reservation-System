@@ -182,10 +182,11 @@ void ReservationHistory::adminSearchMenu()
 
         cout << "\t" << setfill('-') << setw(149) << "\n";
 
-        cout << "\n\t\t\t\t\t\t\t\tTime taken for search: " << milliseconds << " milliseconds." << endl;
-        cout << "\n\t\t\t\t\t\t\t\t    Binary Search technique is used." << endl;
+        cout << "\n\t\t\t\t\t\t\tStart Time: " << start.time_since_epoch().count() << "\tEnd Time: " << end.time_since_epoch().count() << endl;
+        cout << "\n\t\t\t\t\t\t\tTime taken for search: " << milliseconds << " milliseconds." << endl;
+        cout << "\n\t\t\t\t\t\t\tBinary Search technique is used." << endl;
 
-        cout << "\n\n\n\n\t\t\t\t\t\t\t\t";
+        cout << "\n\n\t\t\t\t\t\t\t\t";
 
     }
     else
@@ -196,7 +197,7 @@ void ReservationHistory::adminSearchMenu()
         cout << "\t\t|" << setfill(' ') << setw(84) << " |\n";
         cout << "\t\t" << setfill('-') << setw(85) << "\n";
 
-        cout << "\n\n\n\n\t\t\t\t\t     ";
+        cout << "\n\n\t\t\t\t\t     ";
     }
 
     system("pause");
@@ -292,10 +293,11 @@ void ReservationHistory::custSearchMenu()
         cout << "\t|" << setfill(' ') << setw(83 - c) << "Average Spend Amount: RM " << avg << setw(60) << "|\n";
         cout << "\t" << setfill('-') << setw(149) << "\n";
 
+        cout << "\n\t\t\t\t\t\t\tStart Time: " << start.time_since_epoch().count() << "\tEnd Time: " << end.time_since_epoch().count() << endl;
         cout << "\n\t\t\t\t\t\t\tTime taken for search: " << milliseconds << " milliseconds." << endl;
-        cout << "\n\t\t\t\t\t\t\t\tLinear Search technique is used." << endl;
+        cout << "\n\t\t\t\t\t\t\tLinear Search technique is used." << endl;
 
-        cout << "\n\n\n\n\t\t\t\t\t\t\t\t";
+        cout << "\n\n\t\t\t\t\t\t\t\t";
     }
     else
     {
@@ -305,7 +307,7 @@ void ReservationHistory::custSearchMenu()
         cout << "\t\t|" << setfill(' ') << setw(84) << " |\n";
         cout << "\t\t" << setfill('-') << setw(85) << "\n";
 
-        cout << "\n\n\n\n\t\t\t\t\t     ";
+        cout << "\n\n\t\t\t\t\t     ";
     }
 
     system("pause");
