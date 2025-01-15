@@ -32,7 +32,7 @@ public:
     static int binarySearchByCustomerName(Reservation[], string, Reservation[]);
 
     // sorting
-    static void mergeSortByCustomerName(Reservation reservations[], int left, int right, Reservation temp[]);
+    static int mergeSortByCustomerName(Reservation reservations[], int left, int right, Reservation temp[]);
     static int bubbleSortByPrice(Reservation reservations[], int size, bool);
 };
 

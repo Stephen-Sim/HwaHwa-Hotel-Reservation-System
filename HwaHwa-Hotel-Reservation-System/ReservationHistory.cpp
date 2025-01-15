@@ -751,7 +751,7 @@ void ReservationHistory::displaySort(Reservation reservations[], int current, lo
         auto start = chrono::high_resolution_clock::now();
 
         // Perform merge sort
-        ReservationHistory::mergeSortByCustomerName(reservations, 0, rowSize - 1, temp);
+        int swap = ReservationHistory::mergeSortByCustomerName(reservations, 0, rowSize - 1, temp);
 
         // End measuring time
         auto end = chrono::high_resolution_clock::now();
@@ -759,7 +759,7 @@ void ReservationHistory::displaySort(Reservation reservations[], int current, lo
         double milliseconds = duration.count() * 1000; // Convert to milliseconds
 
         // Display sorted results
-        ReservationHistory::displaySort(reservations, current, start.time_since_epoch().count(), end.time_since_epoch().count(), milliseconds, "Merge Sort", isImproved);
+        ReservationHistory::displaySort(reservations, current, start.time_since_epoch().count(), end.time_since_epoch().count(), milliseconds, "Merge Sort", isImproved, swap);
     }
     else if (current == 2)
     {
@@ -827,11 +827,7 @@ void ReservationHistory::sortReservationHistoryDataTable(Reservation reservation
         cout << "\n\t\t\t\t\t\t\tStart Time: " << start << "\tEnd Time: " << end << endl;
         cout << "\n\t\t\t\t\t\t\tTime taken for search: " << time << " milliseconds." << endl;
         cout << "\n\t\t\t\t\t\t\t" << sorting_method << " technique is used." << endl;
-
-        if (sorting_method == "Bubble Sort")
-        {
-            cout << "\n\t\t\t\t\t\t\tNumber of Swap: " << swap << endl;
-        }
+        cout << "\n\t\t\t\t\t\t\tNumber of Swap: " << swap << endl;
     }
 
     cout << endl << setfill(' ') << setw(80) << "> " << current;
@@ -1112,16 +1108,17 @@ int ReservationHistory::binarySearchByCustomerName(Reservation reservations[], s
     return resultCount; // Return the number of matching rows
 }
 
-void ReservationHistory::mergeSortByCustomerName(Reservation reservations[], int left, int right, Reservation temp[]) {
+int ReservationHistory::mergeSortByCustomerName(Reservation reservations[], int left, int right, Reservation temp[]) {
     if (left >= right) {
-        return; // Base case: single element
+        return 0; // Base case: single element, no swaps
     }
 
     int mid = (left + right) / 2;
 
-    // Recursively sort both halves
-    mergeSortByCustomerName(reservations, left, mid, temp);
-    mergeSortByCustomerName(reservations, mid + 1, right, temp);
+    // Recursively sort both halves and count swaps
+    int swapCount = 0;
+    swapCount += mergeSortByCustomerName(reservations, left, mid, temp);
+    swapCount += mergeSortByCustomerName(reservations, mid + 1, right, temp);
 
     // Merge the sorted halves
     int i = left, j = mid + 1, k = left;
@@ -1131,9 +1128,11 @@ void ReservationHistory::mergeSortByCustomerName(Reservation reservations[], int
         }
         else {
             temp[k++] = reservations[j++];
+            swapCount += (mid - i + 1); // All remaining elements in the left half are swapped
         }
     }
 
+    // Copy remaining elements from both halves
     while (i <= mid) {
         temp[k++] = reservations[i++];
     }
@@ -1145,6 +1144,8 @@ void ReservationHistory::mergeSortByCustomerName(Reservation reservations[], int
     for (int idx = left; idx <= right; idx++) {
         reservations[idx] = temp[idx];
     }
+
+    return swapCount; // Return total swaps
 }
 
 int ReservationHistory::bubbleSortByPrice(Reservation reservations[], int size, bool isImproved) {
